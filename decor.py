@@ -57,21 +57,24 @@ def decorate_as_float(func):
     # wrapper.__name__ = func.__name__
     # wrapper.__doc__ = func.__doc__
     return wrapper
+def auth(with_login: bool = False):
+    def auth_provider(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
 
-def auth(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+            name = input('Enter ur name:')
+            password = input('Enter ur password:')
+            if name == 'admin' and password == '1234':
+                result = func(*args, **kwargs)
+                return result
+            if with_login:
+                print(f'User {name} tried to access to the function {func.__name__}')
+            print('Access not allowed')
 
-        name = input('Enter ur name:')
-        password = input('Enter ur password:')
-        if name == 'admin' and password == '1234':
-            result = func(*args, **kwargs)
-            return result
-        print('Access not allowed')
+        return wrapper
+    return auth_provider
 
-    return wrapper
-
-@auth
+@auth(with_login=True)
 @decorate_as_float
 def mul_two_args(value1: int, value2: int) -> int:
     return value1 * value2
